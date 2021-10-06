@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App</title>
+    <style>
+        *{
+            box-sizing: border-box;
+            margin: 0;
+            user-select: none;
+            padding: 0;
+        }
+        body{
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        h1 {
+            font-weight: 400;
+            font-size: 3rem;
+            margin: 22px 0;
+        }
+        .container{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #app{
+            width: 300px;
+            height: 350px;
+            border: 1px solid lightseagreen;
+            display: grid;
+            /* grid-gap: 1px; */
+            grid-template-columns: repeat(3, 1fr);
+        }
+        #app .box{
+            height: 100%;
+            background-color: red;
+            display: flex;
+            align-items: center;
+            /* color: transparent; */
+            justify-content: center;
+            cursor: pointer;
+            transition: 777ms;
+        }
+        #app .box:active{
+            opacity: .6;
+        }
+        #app .none{
+            background-color: transparent;
+        }
+        [data-id]{
+            background-position: center center;
+            background-size: 100% 100% !important;
+            background-repeat: no-repeat;
+        }
+        [data-id = '1']{
+            background: url(./12.jpg);
+        }
+        [data-id = '2']{
+            background: url(./11.jpg);
+        }
+        [data-id = '3']{
+            background: url(./10.jpg);
+        }
+        [data-id = '4']{
+            background: url(./9.jpg);
+        }
+        [data-id = '5']{
+            background: url(./8.jpg);
+        }
+        [data-id = '6']{
+            background: url(./7.jpg);
+        }
+        [data-id = '7']{
+            background: url(./6.jpg);
+        }
+        [data-id = '8']{
+            background: url(./5.jpg);
+        }
+        [data-id = '9']{
+            background: url(./4.jpg);
+        }
+        [data-id = '10']{
+            background: url(./3.jpg);
+        }
+        [data-id = '11']{
+            background: url(./2.jpg);
+        }
+        [data-id = '12']{
+            background: url(./1.jpg);
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>Rompecabezas <span style="color: #de4e67;display: block;text-align: center;">Rosa</span> </h1>
+    <div class="container">
+        <div style="display: flex;flex-direction: column;align-items: center;">
+            <span>Ejemplo</span>
+            <img src="./ejemplo.png" alt="" style="margin: 10px;">
+        </div>
+        <div id="app" class="app">
+            <!--  -->
+        </div>
+    </div>
+    <p style="margin: 3em;text-align: center;">Selecciona dando clic en la pieza a mover y luego da clic en el espacio en blanco del rompecabezas.</p>
+
+    <script>
+        let w,d,app
+        w = window, d = document, app = d.querySelector('#app')
+
+        var s = new Set() //Guardar items desordenados sin duplicar
+        function Desordenar(){
+            for(let i=0;i<12;i++){
+                let v = Math.floor(Math.random() * 12)
+                if(s.has(v) == false){ 
+                    s.add( v )
+                }else{
+                    for(let i=0;i<12;i++){
+                        let v = Math.floor(Math.random() * 12)
+                        if(s.has(v) == false){
+                            s.add( v )
+                        }else{
+                            
+                        }
+                    }                    
+                }
+            }         
+        }
+        
+        Desordenar()
+
+        var j = {
+            '1': [2,4],
+            '2': [1,3,5],
+            '3': [2,6],
+            '4': [1,5,7],
+            '5': [2,4,6,8],
+            '6': [3,5,9],
+            '7': [4,8,10],
+            '8': [5,7,9,11],
+            '9': [6,8,12],
+            '10': [7,11],
+            '11': [10,8,12],
+            '12': [9,11],
+        }
+
+        var jugables = []
+        s.forEach((e)=>{
+            var el = d.createElement('div')
+            el.setAttribute('data-id', e)
+            el.innerText = e
+            el.classList.add('box')
+            if( e == 0 ){
+                el.classList.add('none')
+                el.innerText = ''
+            }
+            app.appendChild(el)
+        })
+
+        var target = {} //
+        var object = {}
+
+        var o = null
+        var dt = null
+        function selection(e){
+            let index = parseInt(e.getAttribute('data-index'))
+            if( jugables.indexOf(index) !== -1 ){
+                o = e
+                object['class'] = e.getAttribute('class')
+                object['id'] = e.getAttribute('data-id')
+                object['index'] = e.getAttribute('data-index')
+                object['click'] = e.getAttribute('onclick')
+                object['texto'] = e.innerText
+            }
+            if(object['id'] && e.classList.contains('none')){
+                dt = e
+                target['class'] = e.getAttribute('class')
+                target['id'] = e.getAttribute('data-id')
+                target['index'] = e.getAttribute('data-index')
+                target['click'] = e.getAttribute('onclick')
+                target['texto'] = e.innerText
+                
+                dt.className = object['class'] 
+                dt.setAttribute('data-id', object['id'])
+                dt.setAttribute('data-index', object['index'])
+                dt.setAttribute('onclick', object['click'])
+                dt.innerText = object['texto'] 
+               
+                o.className = target['class'] 
+                o.setAttribute('data-id', target['id'])
+                o.setAttribute('data-index', target['index'])
+                o.setAttribute('onclick', target['click']) 
+                o.innerText = target['texto'] 
+
+                preparar() 
+
+            }                       
+        }
+
+        var orden = []
+        var validar = [1,2,3,4,5,6,7,8,9,10,11,0]
+        function preparar(){
+            orden = []
+            var box = d.querySelectorAll('.box')
+            box.forEach((e, i)=>{
+                orden.push(parseInt(e.getAttribute('data-id')))
+                e.setAttribute('data-index', i+1)
+                e.setAttribute('onclick', 'selection(this)')
+                if( e.classList.contains('none') ){
+                    var id = e.getAttribute('data-index')
+                    jugables = j[id]
+                }
+            })     
+            if( JSON.stringify(orden) === JSON.stringify(validar) ){
+                alert("Ganaste! Felicidades.")
+                setTimeout(function(){
+                    d.querySelectorAll('.none')[0].setAttribute('data-id', '12')
+                    d.querySelectorAll('.none')[0].innerText = 12
+                }, 1000)
+            }
+        }
+
+        preparar()
+        
+        w.addEventListener('load', function(){
+            var none = d.querySelectorAll('.none')
+            setTimeout(function(){
+                if(none.length > 1){
+                    location.reload()
+                }
+            }, 1000)
+        })
+    </script>
+
+</body>
+</html>
